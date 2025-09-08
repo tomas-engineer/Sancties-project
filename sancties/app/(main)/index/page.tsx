@@ -1,3 +1,10 @@
+import Button from "@/components/button";
+
 export default function Index() {
-  return <h1>Index pagina</h1>;
+  return (
+    <div>
+      <h1>Test pagina</h1>
+      <Button />
+    </div>
+  );
 }
