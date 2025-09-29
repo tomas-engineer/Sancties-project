@@ -8,7 +8,7 @@ export default function Layout({
   return (
     <div id="root" className="h-dvh grid grid-rows-[auto_1fr_auto]">
       <Header />
-      <main>{children}</main>
+      <main className="p-2">{children}</main>
       <Footer />
     </div>
   );

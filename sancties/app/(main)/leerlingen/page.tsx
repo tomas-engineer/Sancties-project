@@ -3,7 +3,11 @@ import Link from "next/link";
 
 export default function Leerlingen() {
   const leerlingen = [
-    { id: 1, name: "Peter", sancties: [sancties[0], sancties[2], sancties[3], sancties[1]] },
+    {
+      id: 1,
+      name: "Peter",
+      sancties: [sancties[0], sancties[2], sancties[3], sancties[1]],
+    },
     { id: 2, name: "Gerard", sancties: [sancties[1], sancties[3]] },
   ];
 
@@ -16,7 +20,7 @@ export default function Leerlingen() {
               <th scope="col">ID</th>
               <th scope="col">Naam</th>
               <th scope="col">Sancties</th>
-              <th scope="col">Sanctie Maken</th>
+              <th scope="col">Sanctie Koppelen</th>
             </tr>
           </thead>
 
@@ -45,7 +49,7 @@ export default function Leerlingen() {
                   )}
                 </td>
                 <td scope="col">
-                  <button className="btn btn-primary">Maken</button>
+                  <button className="btn btn-primary">Koppelen</button>
                 </td>
               </tr>
             ))}

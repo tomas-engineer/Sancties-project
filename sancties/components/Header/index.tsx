@@ -3,7 +3,9 @@ import Link from "next/link";
 const Header = () => {
   return (
     <header className="w-full bg-blue-400 flex flex-row items-center justify-between px-3 py-1">
-      <span className="text-white text-[30px]!">Sancties</span>
+      <Link className="text-white text-[30px]! no-underline!" href={"/"}>
+        Sancties
+      </Link>
       <MenuOptions />
     </header>
   );
