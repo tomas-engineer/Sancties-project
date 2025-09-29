@@ -1,7 +1,7 @@
 "use client";
 import sancties from "@/data/sancties.json";
 import Link from "next/link";
-import { useState } from "react";
+import { MouseEvent, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 
 interface Filter {
@@ -43,19 +43,47 @@ export default function Leerlingen() {
     }
   };
 
+  const toggleSanctieFilter = (e: MouseEvent) => {
+    e.stopPropagation();
+    const element = e.target as HTMLElement;
+    const div = element.closest("div") as HTMLDivElement;
+    const sanctie = div.textContent;
+
+    setFilter((prev) => ({
+      ...prev,
+      hasSancties: prev.hasSancties
+        ? prev.hasSancties.includes(sanctie)
+          ? prev.hasSancties.filter((prevSanctie) => prevSanctie !== sanctie)
+          : [...prev.hasSancties, sanctie]
+        : [sanctie],
+    }));
+  };
+
   return (
     <>
       <section className="w-full">
         <div className="flex flex-row items-center mb-4 gap-2">
           <Dropdown>
             <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-              Dropdown button
+              Sancties
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+              {sancties.map((sanctie, index) => (
+                <Dropdown.Item
+                  key={index}
+                  onClick={(e) => toggleSanctieFilter(e)}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={filter.hasSancties?.includes(sanctie) || false}
+                      readOnly
+                    />
+                    <span className="text-[17px]!">{sanctie}</span>
+                  </div>
+                </Dropdown.Item>
+              ))}
             </Dropdown.Menu>
           </Dropdown>
 
@@ -73,7 +101,10 @@ export default function Leerlingen() {
             type="naam"
             placeholder="Leerling naam"
             onChange={(e) =>
-              updateFilters({ type: "name", content: String(e.target.value.toLowerCase()) })
+              updateFilters({
+                type: "name",
+                content: String(e.target.value.toLowerCase()),
+              })
             }
           />
         </div>
@@ -106,7 +137,8 @@ export default function Leerlingen() {
                         leerling.sancties && leerling.sancties.includes(sanctie)
                     )) ||
                   (filter.hasId && filter.hasId !== leerling.id) ||
-                  (filter.hasName && filter.hasName !== leerling.name.toLowerCase())
+                  (filter.hasName &&
+                    !leerling.name.toLowerCase().startsWith(filter.hasName))
               ) && (
                 <tr>
                   <td>No results found</td>
@@ -120,7 +152,8 @@ export default function Leerlingen() {
               const { hasId, hasName, hasSancties } = filter;
 
               if (hasId && leerling.id !== hasId) return;
-              if (hasName && leerling.name.toLowerCase() !== hasName) return;
+              if (hasName && !leerling.name.toLowerCase().startsWith(hasName))
+                return;
               if (
                 hasSancties &&
                 !hasSancties.every(
