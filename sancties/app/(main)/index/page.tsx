@@ -10,13 +10,15 @@ export default function Index() {
         <div className="flex flex-row items-stretch gap-5 mt-5">
           <div className="flex flex-col">
             <h4>Beheren</h4>
-            <Link href={"/leerlingen"}>Sanctie koppelen</Link>
+            <Link href={"/sancties"}>Sancties</Link>
+            <Link href={"/leerlingen"}>Leerlingen</Link>
           </div>
 
           <div className="flex flex-col">
             <h4>Aanmaken</h4>
-            <Link href={"/sancties#new"}>Nieuwe sanctie</Link>
-            <Link href={"/leerlingen#new"}>Nieuwe leerling</Link>
+            <Link href={"/sancties/new"}>Nieuwe sanctie</Link>
+            <Link href={"/leerlingen/new"}>Nieuwe leerling</Link>
+            <Link href={"/leerlingen/koppel"}>Sanctie koppelen</Link>
           </div>
         </div>
       </section>

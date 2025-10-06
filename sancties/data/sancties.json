@@ -1,1 +1,22 @@
-["Bord vegen", "Nablijven", "Koffie halen", "Snoep kopen"]
+[
+  {
+    "id": 1,
+    "naam": "Bord vegen",
+    "niveau": 1
+  },
+  {
+    "id": 2,
+    "naam": "Nablijven",
+    "niveau": 2
+  },
+  {
+    "id": 3,
+    "naam": "Koffie halen",
+    "niveau": 1
+  },
+  {
+    "id": 4,
+    "naam": "Snoep kopen",
+    "niveau": 1
+  }
+]
