@@ -18,7 +18,6 @@ export default function Index() {
             <h4>Aanmaken</h4>
             <Link href={"/sancties/new"}>Nieuwe sanctie</Link>
             <Link href={"/leerlingen/new"}>Nieuwe leerling</Link>
-            <Link href={"/leerlingen/koppel"}>Sanctie koppelen</Link>
           </div>
         </div>
       </section>

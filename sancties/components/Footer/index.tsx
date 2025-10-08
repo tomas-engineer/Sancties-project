@@ -1,7 +1,19 @@
+import Link from "next/link";
+
 const Footer = () => {
   return (
     <footer className="w-full bg-blue-400 flex flex-row items-center justify-between px-3">
-      <span className="text-[20px]! text-white">Sancties</span>
+      <nav className="flex flex-row items-center gap-3">
+        <Link className="link-light link-opacity-75-hover" href={"/"}>
+          Home
+        </Link>
+        <Link className="link-light link-opacity-75-hover" href={"/leerlingen"}>
+          Leerlingen
+        </Link>
+        <Link className="link-light link-opacity-75-hover" href={"/sancties"}>
+          Sancties
+        </Link>
+      </nav>
     </footer>
   );
 };

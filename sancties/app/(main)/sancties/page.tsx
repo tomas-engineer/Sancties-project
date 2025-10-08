@@ -88,32 +88,34 @@ export default function Sancties() {
           />
         </div>
 
-        <table className="table">
-          <thead>
-            <tr>
-              <th scope="col">ID</th>
-              <th scope="col">Naam</th>
-              <th scope="col">Niveau</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSancties.length === 0 ? (
+        <div className="overflow-y-auto max-h-[calc(100vh-10rem)]">
+          <table className="table table-striped">
+            <thead>
               <tr>
-                <td colSpan={4}>Geen resultaten gevonden</td>
+                <th scope="col">ID</th>
+                <th scope="col">Naam</th>
+                <th scope="col">Niveau</th>
               </tr>
-            ) : (
-              filteredSancties.map((sanctie) => {
-                return (
-                  <tr key={sanctie.id}>
-                    <th scope="row">{sanctie.id}</th>
-                    <td scope="col">{sanctie.naam}</td>
-                    <td scope="col">{sanctie.niveau}</td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredSancties.length === 0 ? (
+                <tr>
+                  <td colSpan={4}>Geen resultaten gevonden</td>
+                </tr>
+              ) : (
+                filteredSancties.map((sanctie) => {
+                  return (
+                    <tr key={sanctie.id}>
+                      <th scope="row">{sanctie.id}</th>
+                      <td scope="col">{sanctie.naam}</td>
+                      <td scope="col">{sanctie.niveau}</td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </>
   );

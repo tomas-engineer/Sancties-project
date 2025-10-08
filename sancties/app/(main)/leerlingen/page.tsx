@@ -119,56 +119,63 @@ export default function Leerlingen() {
         />
       </div>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Naam</th>
-            <th scope="col">Sancties</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {filteredLeerlingen.length === 0 ? (
+      <div className="overflow-y-auto max-h-[calc(100vh-10rem)]">
+        <table className="table table-striped">
+          <thead className="sticky top-0">
             <tr>
-              <td colSpan={4}>Geen resultaten gevonden</td>
+              <th scope="col">ID</th>
+              <th scope="col">Naam</th>
+              <th scope="col">Sancties</th>
+              <th scope="col"></th>
             </tr>
-          ) : (
-            filteredLeerlingen.map((leerling) => (
-              <tr key={leerling.id}>
-                <th scope="row">{leerling.id}</th>
-                <td>{leerling.name}</td>
-                <td>
-                  {leerling.sancties.length > 0 ? (
-                    <div className="flex flex-row items-center gap-3">
-                      <span>
-                        {leerling.sancties.join(", ").slice(0, 40)}
-                        {leerling.sancties.join(", ").length > 40 ? "..." : ""}
-                      </span>
-                      <Link
-                        className="btn btn-primary"
-                        href={`/leerlingen/sancties?${leerling.sancties
-                          .map((s) => encodeURIComponent(s))
-                          .join("&")}`}
-                      >
-                        Alles bekijken
-                      </Link>
-                    </div>
-                  ) : (
-                    <span>Geen sancties</span>
-                  )}
-                </td>
-                <td>
-                  <Link className="btn btn-primary" href={"/leerlingen/koppel"}>
-                    Sanctie koppelen
-                  </Link>
-                </td>
+          </thead>
+
+          <tbody>
+            {filteredLeerlingen.length === 0 ? (
+              <tr>
+                <td colSpan={4}>Geen resultaten gevonden</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              filteredLeerlingen.map((leerling) => (
+                <tr key={leerling.id}>
+                  <th scope="row">{leerling.id}</th>
+                  <td>{leerling.name}</td>
+                  <td>
+                    {leerling.sancties.length > 0 ? (
+                      <div className="flex flex-row items-center gap-3">
+                        <span className="text-[16px]!">
+                          {leerling.sancties.join(", ").slice(0, 40)}
+                          {leerling.sancties.join(", ").length > 40
+                            ? "..."
+                            : ""}
+                        </span>
+                        <Link
+                          className="btn btn-secondary"
+                          href={`/leerlingen/sancties?${leerling.sancties
+                            .map((s) => encodeURIComponent(s))
+                            .join("&")}`}
+                        >
+                          Alles bekijken
+                        </Link>
+                      </div>
+                    ) : (
+                      <span>Geen sancties</span>
+                    )}
+                  </td>
+                  <td>
+                    <Link
+                      className="btn btn-primary"
+                      href={`/leerlingen/koppel?leerling=${leerling.id}`}
+                    >
+                      Sanctie koppelen
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </section>
   );
 }
