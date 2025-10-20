@@ -1,6 +1,5 @@
 "use client";
 import FloatingButton from "@/components/FloatingButton";
-import sancties from "@/data/sancties.json";
 import { useState } from "react";
 
 interface Filter {
@@ -12,7 +11,30 @@ interface Filter {
 export default function Sancties() {
   const [filter, setFilter] = useState<Filter>({});
 
-  const updateFilters = ({
+  const [sancties, setSancties] = useState([
+    {
+      id: 1,
+      naam: "Bord vegen",
+      niveau: 1,
+    },
+    {
+      id: 2,
+      naam: "Nablijven",
+      niveau: 2,
+    },
+    {
+      id: 3,
+      naam: "Koffie halen",
+      niveau: 1,
+    },
+    {
+      id: 4,
+      naam: "Snoep kopen",
+      niveau: 1,
+    },
+  ]);
+
+  const UpdateFilters = ({
     type,
     content,
   }: {
@@ -38,7 +60,7 @@ export default function Sancties() {
     }
   };
 
-  const filteredSancties = sancties.filter((sanctie) => {
+  const FilteredSancties = sancties.filter((sanctie) => {
     const { hasId, hasName, hasNiveau } = filter;
 
     if (hasId !== undefined && sanctie.id !== hasId) return false;
@@ -47,6 +69,17 @@ export default function Sancties() {
 
     return true;
   });
+
+  const RemoveSanctie = (
+    e: React.MouseEvent,
+    sanctie: { id: number; naam: string; niveau: number }
+  ) => {
+    e.preventDefault();
+
+    setSancties((prev) =>
+      prev.filter((prevSanctie) => prevSanctie.id !== sanctie.id)
+    );
+  };
 
   return (
     <>
@@ -57,7 +90,7 @@ export default function Sancties() {
             type="number"
             placeholder="Sanctie ID"
             onChange={(e) =>
-              updateFilters({
+              UpdateFilters({
                 type: "id",
                 content: e.target.value.toLowerCase(),
               })
@@ -69,7 +102,7 @@ export default function Sancties() {
             type="text"
             placeholder="Sanctie naam"
             onChange={(e) =>
-              updateFilters({
+              UpdateFilters({
                 type: "name",
                 content: e.target.value.toLowerCase(),
               })
@@ -81,7 +114,7 @@ export default function Sancties() {
             type="number"
             placeholder="Sanctie niveau"
             onChange={(e) =>
-              updateFilters({
+              UpdateFilters({
                 type: "niveau",
                 content: e.target.value.toLowerCase(),
               })
@@ -96,20 +129,29 @@ export default function Sancties() {
                 <th scope="col">ID</th>
                 <th scope="col">Naam</th>
                 <th scope="col">Niveau</th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
-              {filteredSancties.length === 0 ? (
+              {FilteredSancties.length === 0 ? (
                 <tr>
                   <td colSpan={4}>Geen resultaten gevonden</td>
                 </tr>
               ) : (
-                filteredSancties.map((sanctie) => {
+                FilteredSancties.map((sanctie) => {
                   return (
                     <tr key={sanctie.id}>
                       <th scope="row">{sanctie.id}</th>
                       <td scope="col">{sanctie.naam}</td>
                       <td scope="col">{sanctie.niveau}</td>
+                      <td scope="col">
+                        <button
+                          className="btn btn-secondary"
+                          onClick={(e) => RemoveSanctie(e, sanctie)}
+                        >
+                          Sanctie wissen
+                        </button>
+                      </td>
                     </tr>
                   );
                 })

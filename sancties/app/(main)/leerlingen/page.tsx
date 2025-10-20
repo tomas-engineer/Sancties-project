@@ -1,6 +1,5 @@
 "use client";
 import FloatingButton from "@/components/FloatingButton";
-import sancties from "@/data/sancties.json";
 import Link from "next/link";
 import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -12,6 +11,29 @@ interface Filter {
 }
 
 export default function Leerlingen() {
+  const [sancties, setSancties] = useState([
+    {
+      id: 1,
+      naam: "Bord vegen",
+      niveau: 1,
+    },
+    {
+      id: 2,
+      naam: "Nablijven",
+      niveau: 2,
+    },
+    {
+      id: 3,
+      naam: "Koffie halen",
+      niveau: 1,
+    },
+    {
+      id: 4,
+      naam: "Snoep kopen",
+      niveau: 1,
+    },
+  ]);
+
   const [leerlingen, setLeerlingen] = useState([
     {
       id: 1,
@@ -28,7 +50,7 @@ export default function Leerlingen() {
 
   const [filter, setFilter] = useState<Filter>({});
 
-  const updateFilters = ({
+  const UpdateFilters = ({
     type,
     content,
   }: {
@@ -48,7 +70,7 @@ export default function Leerlingen() {
     }
   };
 
-  const toggleSanctieFilter = (e: React.MouseEvent, naam: string) => {
+  const ToggleSanctieFilter = (e: React.MouseEvent, naam: string) => {
     e.stopPropagation();
 
     setFilter((prev) => ({
@@ -61,7 +83,7 @@ export default function Leerlingen() {
     }));
   };
 
-  const sanctieToevoegen = (
+  const SanctieToevoegen = (
     e: React.MouseEvent,
     naam: string,
     leerling: { id: number; name: string; sancties: string[] }
@@ -82,7 +104,7 @@ export default function Leerlingen() {
     );
   };
 
-  const filteredLeerlingen = leerlingen.filter((leerling) => {
+  const FilteredLeerlingen = leerlingen.filter((leerling) => {
     const { hasId, hasName, hasSancties } = filter;
 
     if (hasId !== undefined && leerling.id !== hasId) return false;
@@ -105,7 +127,7 @@ export default function Leerlingen() {
             {sancties.map((sanctie, index) => (
               <Dropdown.Item
                 key={index}
-                onClick={(e) => toggleSanctieFilter(e, sanctie.naam)}
+                onClick={(e) => ToggleSanctieFilter(e, sanctie.naam)}
               >
                 <div className="flex flex-row items-center gap-2">
                   <input
@@ -127,7 +149,7 @@ export default function Leerlingen() {
           type="number"
           placeholder="Leerling ID"
           onChange={(e) =>
-            updateFilters({ type: "id", content: e.target.value.toLowerCase() })
+            UpdateFilters({ type: "id", content: e.target.value.toLowerCase() })
           }
         />
 
@@ -136,7 +158,7 @@ export default function Leerlingen() {
           type="text"
           placeholder="Leerling naam"
           onChange={(e) =>
-            updateFilters({
+            UpdateFilters({
               type: "name",
               content: e.target.value.toLowerCase(),
             })
@@ -156,12 +178,12 @@ export default function Leerlingen() {
           </thead>
 
           <tbody>
-            {filteredLeerlingen.length === 0 ? (
+            {FilteredLeerlingen.length === 0 ? (
               <tr>
                 <td colSpan={4}>Geen resultaten gevonden</td>
               </tr>
             ) : (
-              filteredLeerlingen.map((leerling) => (
+              FilteredLeerlingen.map((leerling) => (
                 <tr key={leerling.id}>
                   <th scope="row">{leerling.id}</th>
                   <td>{leerling.name}</td>
@@ -198,7 +220,7 @@ export default function Leerlingen() {
                           <Dropdown.Item
                             key={index}
                             onClick={(e) =>
-                              sanctieToevoegen(e, sanctie.naam, leerling)
+                              SanctieToevoegen(e, sanctie.naam, leerling)
                             }
                           >
                             <div className="flex flex-row items-center gap-2">

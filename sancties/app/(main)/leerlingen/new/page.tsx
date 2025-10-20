@@ -5,7 +5,7 @@ import { FormEvent, useState } from "react";
 export default function New() {
   const [error, setError] = useState<string | boolean>(false);
 
-  const submitForm = (e: FormEvent) => {
+  const SubmitForm = (e: FormEvent) => {
     e.preventDefault();
     setError(false);
 
@@ -22,7 +22,7 @@ export default function New() {
     <div className="flex flex-col items-center justify-center h-full">
       <form
         className="flex flex-row items-center justify-center gap-2 mb-3"
-        onSubmit={submitForm}
+        onSubmit={SubmitForm}
       >
         <input
           type="text"
