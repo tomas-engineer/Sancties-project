@@ -37,7 +37,10 @@ export default function Leerlingen() {
   }) => {
     switch (type) {
       case "id":
-        setFilter((prev) => ({ ...prev, hasId: content as number }));
+        setFilter((prev) => ({
+          ...prev,
+          hasId: content === "" ? undefined : Number(content),
+        }));
         break;
       case "name":
         setFilter((prev) => ({ ...prev, hasName: content as string }));
@@ -82,7 +85,7 @@ export default function Leerlingen() {
   const filteredLeerlingen = leerlingen.filter((leerling) => {
     const { hasId, hasName, hasSancties } = filter;
 
-    if (hasId && leerling.id !== hasId) return false;
+    if (hasId !== undefined && leerling.id !== hasId) return false;
     if (hasName && !leerling.name.toLowerCase().includes(hasName)) return false;
     if (hasSancties && !hasSancties.every((s) => leerling.sancties.includes(s)))
       return false;
@@ -124,7 +127,7 @@ export default function Leerlingen() {
           type="number"
           placeholder="Leerling ID"
           onChange={(e) =>
-            updateFilters({ type: "id", content: Number(e.target.value) })
+            updateFilters({ type: "id", content: e.target.value.toLowerCase() })
           }
         />
 
