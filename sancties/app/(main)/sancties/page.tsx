@@ -1,4 +1,5 @@
 "use client";
+import FloatingButton from "@/components/FloatingButton";
 import sancties from "@/data/sancties.json";
 import { useState } from "react";
 
@@ -88,7 +89,7 @@ export default function Sancties() {
           />
         </div>
 
-        <div className="overflow-y-auto max-h-[calc(100vh-10rem)]">
+        <div>
           <table className="table table-striped">
             <thead>
               <tr>
@@ -116,6 +117,8 @@ export default function Sancties() {
             </tbody>
           </table>
         </div>
+
+        <FloatingButton target="/sancties/new" />
       </section>
     </>
   );

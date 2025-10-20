@@ -1,7 +1,8 @@
 "use client";
+import FloatingButton from "@/components/FloatingButton";
 import sancties from "@/data/sancties.json";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 
 interface Filter {
@@ -11,7 +12,7 @@ interface Filter {
 }
 
 export default function Leerlingen() {
-  const leerlingen = [
+  const [leerlingen, setLeerlingen] = useState([
     {
       id: 1,
       name: "Peter",
@@ -23,7 +24,7 @@ export default function Leerlingen() {
       ],
     },
     { id: 2, name: "Gerard", sancties: [sancties[1].naam, sancties[3].naam] },
-  ];
+  ]);
 
   const [filter, setFilter] = useState<Filter>({});
 
@@ -55,6 +56,27 @@ export default function Leerlingen() {
           : [...prev.hasSancties, naam]
         : [naam],
     }));
+  };
+
+  const sanctieToevoegen = (
+    e: React.MouseEvent,
+    naam: string,
+    leerling: { id: number; name: string; sancties: string[] }
+  ) => {
+    e.stopPropagation();
+
+    setLeerlingen((prev) =>
+      prev.map((prevLeerling) =>
+        prevLeerling.id === leerling.id
+          ? {
+              ...prevLeerling,
+              sancties: prevLeerling.sancties.includes(naam)
+                ? prevLeerling.sancties.filter((s) => s !== naam)
+                : [...prevLeerling.sancties, naam],
+            }
+          : prevLeerling
+      )
+    );
   };
 
   const filteredLeerlingen = leerlingen.filter((leerling) => {
@@ -119,7 +141,7 @@ export default function Leerlingen() {
         />
       </div>
 
-      <div className="overflow-y-auto max-h-[calc(100vh-10rem)]">
+      <div>
         <table className="table table-striped">
           <thead className="sticky top-0">
             <tr>
@@ -163,12 +185,36 @@ export default function Leerlingen() {
                     )}
                   </td>
                   <td>
-                    <Link
-                      className="btn btn-primary"
-                      href={`/leerlingen/koppel?leerling=${leerling.id}`}
-                    >
-                      Sanctie koppelen
-                    </Link>
+                    <Dropdown>
+                      <Dropdown.Toggle variant="secondary" id="dropdown-basic">
+                        Sanctie koppelen
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        {sancties.map((sanctie, index) => (
+                          <Dropdown.Item
+                            key={index}
+                            onClick={(e) =>
+                              sanctieToevoegen(e, sanctie.naam, leerling)
+                            }
+                          >
+                            <div className="flex flex-row items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={
+                                  leerling.sancties?.includes(sanctie.naam) ||
+                                  false
+                                }
+                                readOnly
+                              />
+                              <span className="text-[17px]!">
+                                {sanctie.naam}
+                              </span>
+                            </div>
+                          </Dropdown.Item>
+                        ))}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </td>
                 </tr>
               ))
@@ -176,6 +222,8 @@ export default function Leerlingen() {
           </tbody>
         </table>
       </div>
+
+      <FloatingButton target="/leerlingen/new" />
     </section>
   );
 }
