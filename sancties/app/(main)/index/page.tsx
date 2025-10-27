@@ -20,6 +20,11 @@ export default function Index() {
             <Link href={"/leerlingen/new"}>Nieuwe leerling</Link>
           </div>
         </div>
+
+        <div className="mt-15"></div>
+        <p>
+          Of <Link href="/rad">draai aan het rad</Link>
+        </p>
       </section>
     </>
   );

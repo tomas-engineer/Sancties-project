@@ -23,6 +23,9 @@ const MenuOptions = () => {
       <Link className="link-light link-opacity-75-hover" href={"/sancties"}>
         Sancties
       </Link>
+      <Link className="link-light link-opacity-75-hover" href={"/rad"}>
+        Rad
+      </Link>
     </nav>
   );
 };

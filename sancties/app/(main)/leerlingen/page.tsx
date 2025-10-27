@@ -115,6 +115,17 @@ export default function Leerlingen() {
     return true;
   });
 
+  const RemoveLeerling = (
+    e: React.MouseEvent,
+    leerling: { id: number; name: string; sancties: string[] }
+  ) => {
+    e.preventDefault();
+
+    setLeerlingen((prev) =>
+      prev.filter((prevLeerling) => prevLeerling.id !== leerling.id)
+    );
+  };
+
   return (
     <section className="w-full">
       <div className="flex flex-row items-center mb-4 gap-2">
@@ -174,13 +185,14 @@ export default function Leerlingen() {
               <th scope="col">Naam</th>
               <th scope="col">Sancties</th>
               <th scope="col"></th>
+              <th scope="col"></th>
             </tr>
           </thead>
 
           <tbody>
             {FilteredLeerlingen.length === 0 ? (
               <tr>
-                <td colSpan={4}>Geen resultaten gevonden</td>
+                <td colSpan={5}>Geen resultaten gevonden</td>
               </tr>
             ) : (
               FilteredLeerlingen.map((leerling) => (
@@ -240,6 +252,14 @@ export default function Leerlingen() {
                         ))}
                       </Dropdown.Menu>
                     </Dropdown>
+                  </td>
+                  <td scope="col">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={(e) => RemoveLeerling(e, leerling)}
+                    >
+                      Leerling wissen
+                    </button>
                   </td>
                 </tr>
               ))
