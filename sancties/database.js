@@ -5,7 +5,6 @@ const databasePath = path.join(process.cwd(), 'database.db');
 
 const connect = () => {
     const db = new Database(databasePath);
-    // Enable foreign keys in SQLite
     db.pragma('foreign_keys = ON');
     return db;
 };
@@ -15,7 +14,6 @@ const create = (db) => {
     db.prepare(`DROP TABLE IF EXISTS Leerlingen`).run();
     db.prepare(`DROP TABLE IF EXISTS Sancties`).run();
 
-    // ---- Create tables with FK constraints ----
     db.prepare(`
         CREATE TABLE Sancties (
             ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,3 +77,47 @@ export function seed() {
     console.log('Test data inserted successfully with FK constraints.');
     db.close();
 };
+
+export function FetchLeerlingen() {
+    const db = connect();
+
+    const stmt = db.prepare(`
+        SELECT 
+            l.ID as leerlingID,
+            l.naam as leerlingNaam,
+            s.ID as sanctieID,
+            s.naam as sanctieNaam,
+            s.niveau as sanctieNiveau
+        FROM Leerlingen l
+        LEFT JOIN Straffen st ON st."Leerling ID" = l.ID
+        LEFT JOIN Sancties s ON s.ID = st."Sanctie ID"
+        ORDER BY l.ID
+    `);
+
+    const rows = stmt.all();
+    db.close();
+
+    const result = [];
+    const map = new Map();
+
+    rows.forEach(row => {
+        if (!map.has(row.leerlingID)) {
+            map.set(row.leerlingID, {
+                ID: row.leerlingID,
+                naam: row.leerlingNaam,
+                sancties: []
+            });
+            result.push(map.get(row.leerlingID));
+        }
+
+        if (row.sanctieID !== null) {
+            map.get(row.leerlingID).sancties.push({
+                ID: row.sanctieID,
+                naam: row.sanctieNaam,
+                niveau: row.sanctieNiveau
+            });
+        }
+    });
+
+    return result;
+}

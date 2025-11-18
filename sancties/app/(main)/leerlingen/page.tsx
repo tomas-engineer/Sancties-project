@@ -1,7 +1,7 @@
 "use client";
 import FloatingButton from "@/components/FloatingButton";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 
 interface Filter {
@@ -125,6 +125,16 @@ export default function Leerlingen() {
       prev.filter((prevLeerling) => prevLeerling.id !== leerling.id)
     );
   };
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/leerlingen");
+      if (!response.ok) return console.log(await response.text());
+
+      const data = await response.json();
+      console.log(data);
+    })();
+  }, []);
 
   return (
     <section className="w-full">
