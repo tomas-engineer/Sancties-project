@@ -103,19 +103,18 @@ export function FetchLeerlingen() {
     rows.forEach(row => {
         if (!map.has(row.leerlingID)) {
             map.set(row.leerlingID, {
-                ID: row.leerlingID,
-                naam: row.leerlingNaam,
+                id: row.leerlingID,
+                name: row.leerlingNaam,
                 sancties: []
             });
             result.push(map.get(row.leerlingID));
         }
 
         if (row.sanctieID !== null) {
-            map.get(row.leerlingID).sancties.push({
-                ID: row.sanctieID,
-                naam: row.sanctieNaam,
-                niveau: row.sanctieNiveau
-            });
+            const leerling = map.get(row.leerlingID);
+            if (!leerling.sancties.includes(row.sanctieNaam)) {
+                leerling.sancties.push(row.sanctieNaam);
+            }
         }
     });
 

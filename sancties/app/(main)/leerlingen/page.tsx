@@ -10,7 +10,14 @@ interface Filter {
   hasSancties?: string[];
 }
 
+interface Leerling {
+  id: number;
+  name: string;
+  sancties: string[];
+};
+
 export default function Leerlingen() {
+  const [loading, setLoading] = useState(true);
   const [sancties, setSancties] = useState([
     {
       id: 1,
@@ -34,19 +41,7 @@ export default function Leerlingen() {
     },
   ]);
 
-  const [leerlingen, setLeerlingen] = useState([
-    {
-      id: 1,
-      name: "Peter",
-      sancties: [
-        sancties[0].naam,
-        sancties[2].naam,
-        sancties[3].naam,
-        sancties[1].naam,
-      ],
-    },
-    { id: 2, name: "Gerard", sancties: [sancties[1].naam, sancties[3].naam] },
-  ]);
+  const [leerlingen, setLeerlingen] = useState<Leerling[]>([]);
 
   const [filter, setFilter] = useState<Filter>({});
 
@@ -132,7 +127,9 @@ export default function Leerlingen() {
       if (!response.ok) return console.log(await response.text());
 
       const data = await response.json();
-      console.log(data);
+      if (data?.leerlingen) setLeerlingen(data.leerlingen);
+      
+      setLoading(false);
     })();
   }, []);
 
@@ -202,7 +199,7 @@ export default function Leerlingen() {
           <tbody>
             {FilteredLeerlingen.length === 0 ? (
               <tr>
-                <td colSpan={5}>Geen resultaten gevonden</td>
+                <td colSpan={5}>{loading ? "Leerlingen aan het laden" : "Geen resultaten gevonden"}</td>
               </tr>
             ) : (
               FilteredLeerlingen.map((leerling) => (
