@@ -10,36 +10,21 @@ interface Filter {
   hasSancties?: string[];
 }
 
+interface Sanctie {
+  id: number;
+  naam: string;
+  niveau: string;
+}
+
 interface Leerling {
   id: number;
   name: string;
   sancties: string[];
-};
+}
 
 export default function Leerlingen() {
   const [loading, setLoading] = useState(true);
-  const [sancties, setSancties] = useState([
-    {
-      id: 1,
-      naam: "Bord vegen",
-      niveau: 1,
-    },
-    {
-      id: 2,
-      naam: "Nablijven",
-      niveau: 2,
-    },
-    {
-      id: 3,
-      naam: "Koffie halen",
-      niveau: 1,
-    },
-    {
-      id: 4,
-      naam: "Snoep kopen",
-      niveau: 1,
-    },
-  ]);
+  const [sancties, setSancties] = useState<Sanctie[]>([]);
 
   const [leerlingen, setLeerlingen] = useState<Leerling[]>([]);
 
@@ -122,13 +107,29 @@ export default function Leerlingen() {
   };
 
   useEffect(() => {
-    (async () => {
+    const FetchLeerlingen = async () => {
       const response = await fetch("/api/leerlingen");
       if (!response.ok) return console.log(await response.text());
 
       const data = await response.json();
       if (data?.leerlingen) setLeerlingen(data.leerlingen);
-      
+      return;
+    };
+
+    const FetchSancties = async () => {
+      const response = await fetch("/api/sancties");
+      if (!response.ok) return console.log(await response.text());
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data?.sancties) setSancties(data.sancties);
+      return;
+    };
+
+    (async () => {
+      await FetchLeerlingen();
+      await FetchSancties();
       setLoading(false);
     })();
   }, []);
@@ -199,7 +200,11 @@ export default function Leerlingen() {
           <tbody>
             {FilteredLeerlingen.length === 0 ? (
               <tr>
-                <td colSpan={5}>{loading ? "Leerlingen aan het laden" : "Geen resultaten gevonden"}</td>
+                <td colSpan={5}>
+                  {loading
+                    ? "Leerlingen aan het laden"
+                    : "Geen resultaten gevonden"}
+                </td>
               </tr>
             ) : (
               FilteredLeerlingen.map((leerling) => (

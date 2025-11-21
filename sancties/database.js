@@ -120,3 +120,14 @@ export function FetchLeerlingen() {
 
     return result;
 }
+
+export function FetchSancties() {
+    const db = connect();
+
+    const stmt = db.prepare("SELECT * FROM Sancties");
+    const rows = stmt.all();
+
+    db.close();
+
+    return rows;
+};
