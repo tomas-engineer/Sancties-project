@@ -1,3 +1,4 @@
+/* Alles van Tomas */
 import Link from "next/link";
 
 const Footer = () => {

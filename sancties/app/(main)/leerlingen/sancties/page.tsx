@@ -1,4 +1,6 @@
 "use client";
+/* Alles van Tomas */
+
 import { useSearchParams } from "next/navigation";
 
 export default function Sancties() {

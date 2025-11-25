@@ -52,7 +52,6 @@ export function seed() {
    const db = connect();
    create(db);
 
-   // ---- Insert into Sancties ----
    const sancties = [
       ["Te laat komen", 1],
       ["Ongeoorloofd afwezig", 2],
@@ -65,14 +64,12 @@ export function seed() {
    );
    sancties.forEach((s) => insertSanctie.run(s[0], s[1]));
 
-   // ---- Insert into Leerlingen ----
    const leerlingen = ["Tomas", "Anna", "Jeroen", "Sofie", "Lucas"];
    const insertLeerling = db.prepare(
       `INSERT INTO Leerlingen (naam) VALUES (?)`
    );
    leerlingen.forEach((name) => insertLeerling.run(name));
 
-   // ---- Insert into Straffen ----
    const straffen = [
       [1, 2],
       [2, 1],

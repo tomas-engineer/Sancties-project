@@ -1,4 +1,6 @@
 "use client";
+/* Alles van Tomas */
+
 import { useEffect, useState, useRef, ChangeEvent } from "react";
 import styles from "./rad.module.css";
 
