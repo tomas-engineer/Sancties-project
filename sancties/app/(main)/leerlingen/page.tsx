@@ -112,8 +112,14 @@ export default function Leerlingen() {
       if (!response.ok) return console.log(await response.text());
 
       const data = await response.json();
-      if (data?.leerlingen) setLeerlingen(data.leerlingen);
-      return;
+      if (data?.leerlingen) {
+        const mappedLeerlingen: Leerling[] = data.leerlingen.map((l: any) => ({
+          id: l.ID,
+          name: l.naam,
+          sancties: l.sancties.map((s: any) => s.naam),
+        }));
+        setLeerlingen(mappedLeerlingen);
+      }
     };
 
     const FetchSancties = async () => {
@@ -121,10 +127,14 @@ export default function Leerlingen() {
       if (!response.ok) return console.log(await response.text());
 
       const data = await response.json();
-      console.log(data);
-
-      if (data?.sancties) setSancties(data.sancties);
-      return;
+      if (data?.sancties) {
+        const mappedSancties: Sanctie[] = data.sancties.map((s: any) => ({
+          id: s.ID,
+          naam: s.naam,
+          niveau: s.niveau,
+        }));
+        setSancties(mappedSancties);
+      }
     };
 
     (async () => {
@@ -207,8 +217,8 @@ export default function Leerlingen() {
                 </td>
               </tr>
             ) : (
-              FilteredLeerlingen.map((leerling) => (
-                <tr key={leerling.id}>
+              FilteredLeerlingen.map((leerling, i) => (
+                <tr key={i}>
                   <th scope="row">{leerling.id}</th>
                   <td>{leerling.name}</td>
                   <td>
