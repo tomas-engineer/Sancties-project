@@ -150,3 +150,14 @@ export function DeleteLeerling(id) {
       return false;
    }
 }
+
+export function FetchSancties() {
+   const db = connect();
+
+   const stmt = db.prepare("SELECT * FROM Sancties");
+   const rows = stmt.all();
+
+   db.close();
+
+   return rows;
+}

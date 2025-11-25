@@ -1,6 +1,6 @@
 "use client";
 import FloatingButton from "@/components/FloatingButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Filter {
   hasId?: number;
@@ -8,31 +8,16 @@ interface Filter {
   hasNiveau?: number;
 }
 
-export default function Sancties() {
-  const [filter, setFilter] = useState<Filter>({});
+interface Sanctie {
+  id: number;
+  naam: string;
+  niveau: number;
+}
 
-  const [sancties, setSancties] = useState([
-    {
-      id: 1,
-      naam: "Bord vegen",
-      niveau: 1,
-    },
-    {
-      id: 2,
-      naam: "Nablijven",
-      niveau: 2,
-    },
-    {
-      id: 3,
-      naam: "Koffie halen",
-      niveau: 1,
-    },
-    {
-      id: 4,
-      naam: "Snoep kopen",
-      niveau: 1,
-    },
-  ]);
+export default function Sancties() {
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<Filter>({});
+  const [sancties, setSancties] = useState<Sanctie[]>([]);
 
   const UpdateFilters = ({
     type,
@@ -80,6 +65,37 @@ export default function Sancties() {
       prev.filter((prevSanctie) => prevSanctie.id !== sanctie.id)
     );
   };
+
+  useEffect(() => {
+    const FetchSancties = async () => {
+      const response = await fetch("/api/sancties");
+      if (!response.ok) return console.log(await response.text());
+
+      const data = await response.json();
+      if (data?.sancties)
+        setSancties(
+          data.sancties.map(
+            ({
+              ID,
+              ...rest
+            }: {
+              ID: number;
+              naam: string;
+              niveau: number;
+            }) => ({
+              ...rest,
+              id: ID,
+            })
+          )
+        );
+      return;
+    };
+
+    (async () => {
+      await FetchSancties();
+      setLoading(false);
+    })();
+  }, []);
 
   return (
     <>
@@ -135,7 +151,11 @@ export default function Sancties() {
             <tbody>
               {FilteredSancties.length === 0 ? (
                 <tr>
-                  <td colSpan={4}>Geen resultaten gevonden</td>
+                  <td colSpan={4}>
+                    {loading
+                      ? "Sancties aan het laden"
+                      : "Geen resultaten gevonden"}
+                  </td>
                 </tr>
               ) : (
                 FilteredSancties.map((sanctie) => {

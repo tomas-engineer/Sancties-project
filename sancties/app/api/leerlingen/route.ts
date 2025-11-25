@@ -3,7 +3,6 @@ import { SendResponse } from "@/services/response";
 
 export function GET() {
   const leerlingen = FetchLeerlingen();
-  console.log(leerlingen);
 
   if (!leerlingen || leerlingen.length === 0)
     return SendResponse(

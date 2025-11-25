@@ -10,44 +10,22 @@ interface Filter {
   hasSancties?: string[];
 }
 
+interface Sanctie {
+  id: number;
+  naam: string;
+  niveau: number;
+}
+
+interface Leerling {
+  id: number;
+  name: string;
+  sancties: string[];
+}
+
 export default function Leerlingen() {
-  const [sancties, setSancties] = useState([
-    {
-      id: 1,
-      naam: "Bord vegen",
-      niveau: 1,
-    },
-    {
-      id: 2,
-      naam: "Nablijven",
-      niveau: 2,
-    },
-    {
-      id: 3,
-      naam: "Koffie halen",
-      niveau: 1,
-    },
-    {
-      id: 4,
-      naam: "Snoep kopen",
-      niveau: 1,
-    },
-  ]);
-
-  const [leerlingen, setLeerlingen] = useState([
-    {
-      id: 1,
-      name: "Peter",
-      sancties: [
-        sancties[0].naam,
-        sancties[2].naam,
-        sancties[3].naam,
-        sancties[1].naam,
-      ],
-    },
-    { id: 2, name: "Gerard", sancties: [sancties[1].naam, sancties[3].naam] },
-  ]);
-
+  const [loading, setLoading] = useState(true);
+  const [sancties, setSancties] = useState<Sanctie[]>([]);
+  const [leerlingen, setLeerlingen] = useState<Leerling[]>([]);
   const [filter, setFilter] = useState<Filter>({});
 
   const UpdateFilters = ({
@@ -127,12 +105,30 @@ export default function Leerlingen() {
   };
 
   useEffect(() => {
-    (async () => {
+    const FetchLeerlingen = async () => {
       const response = await fetch("/api/leerlingen");
       if (!response.ok) return console.log(await response.text());
 
       const data = await response.json();
+      if (data?.leerlingen) setLeerlingen(data.leerlingen);
+      return;
+    };
+
+    const FetchSancties = async () => {
+      const response = await fetch("/api/sancties");
+      if (!response.ok) return console.log(await response.text());
+
+      const data = await response.json();
       console.log(data);
+
+      if (data?.sancties) setSancties(data.sancties);
+      return;
+    };
+
+    (async () => {
+      await FetchLeerlingen();
+      await FetchSancties();
+      setLoading(false);
     })();
   }, []);
 
@@ -202,7 +198,11 @@ export default function Leerlingen() {
           <tbody>
             {FilteredLeerlingen.length === 0 ? (
               <tr>
-                <td colSpan={5}>Geen resultaten gevonden</td>
+                <td colSpan={5}>
+                  {loading
+                    ? "Leerlingen aan het laden"
+                    : "Geen resultaten gevonden"}
+                </td>
               </tr>
             ) : (
               FilteredLeerlingen.map((leerling) => (
