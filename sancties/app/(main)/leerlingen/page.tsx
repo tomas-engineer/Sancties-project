@@ -13,7 +13,7 @@ interface Filter {
 interface Sanctie {
   id: number;
   naam: string;
-  niveau: string;
+  niveau: number;
 }
 
 interface Leerling {
@@ -25,9 +25,7 @@ interface Leerling {
 export default function Leerlingen() {
   const [loading, setLoading] = useState(true);
   const [sancties, setSancties] = useState<Sanctie[]>([]);
-
   const [leerlingen, setLeerlingen] = useState<Leerling[]>([]);
-
   const [filter, setFilter] = useState<Filter>({});
 
   const UpdateFilters = ({
