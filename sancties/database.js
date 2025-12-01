@@ -9,7 +9,9 @@ const connect = () => {
    return db;
 };
 
-const create = (db) => {
+export function create() {
+   const db = connect();
+
    db.prepare(`DROP TABLE IF EXISTS Straffen`).run();
    db.prepare(`DROP TABLE IF EXISTS Leerlingen`).run();
    db.prepare(`DROP TABLE IF EXISTS Sancties`).run();
@@ -50,8 +52,18 @@ const create = (db) => {
 
 export function seed() {
    const db = connect();
-   create(db);
 
+   // Wipe existing data
+   db.exec(`DELETE FROM Straffen;`);
+   db.exec(`DELETE FROM Sancties;`);
+   db.exec(`DELETE FROM Leerlingen;`);
+
+   // Reset autoincrement counters (optional, SQLite specific)
+   db.exec(`DELETE FROM sqlite_sequence WHERE name='Sancties';`);
+   db.exec(`DELETE FROM sqlite_sequence WHERE name='Leerlingen';`);
+   db.exec(`DELETE FROM sqlite_sequence WHERE name='Straffen';`);
+
+   // Insert new data
    const sancties = [
       ["Te laat komen", 1],
       ["Ongeoorloofd afwezig", 2],
@@ -77,13 +89,12 @@ export function seed() {
       [4, 4],
       [5, 5],
    ];
-
    const insertStraffen = db.prepare(
       `INSERT INTO Straffen ("Leerling ID", "Sanctie ID") VALUES (?, ?)`
    );
    straffen.forEach((s) => insertStraffen.run(s[0], s[1]));
 
-   console.log("Test data inserted successfully with FK constraints.");
+   console.log("Test data inserted successfully.");
    db.close();
 }
 

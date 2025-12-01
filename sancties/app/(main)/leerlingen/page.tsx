@@ -95,11 +95,28 @@ export default function Leerlingen() {
     return true;
   });
 
-  const RemoveLeerling = (
+  const RemoveLeerling = async (
     e: React.MouseEvent,
     leerling: { id: number; name: string; sancties: string[] }
   ) => {
     e.preventDefault();
+
+    console.log(leerling);
+
+    const response = await fetch("/api/leerlingen/delete", {
+      method: "POST",
+      body: JSON.stringify({
+        id: leerling.id,
+      }),
+    });
+
+    if (!response.ok)
+      return console.log(
+        "Something went wrong deleting the user: " + (await response.text())
+      );
+
+    const data = await response.json();
+    if (!data.success) return;
 
     setLeerlingen((prev) =>
       prev.filter((prevLeerling) => prevLeerling.id !== leerling.id)
