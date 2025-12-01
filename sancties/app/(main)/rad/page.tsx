@@ -128,10 +128,11 @@ export default function Rad() {
         )
     );
 
+    console.log(data && Number.isFinite(Number(data)) ? Number(data) : 0)
     setNiveau(data && Number.isFinite(Number(data)) ? Number(data) : 0);
 
     if (data && Number.isFinite(Number(data))) {
-      if (Number(data) > highestNiveau) element.value = String(highestNiveau);
+      if (Number(data) > highestNiveau) element.value = "";
       else if (Number(data) < 0) element.value = "0";
     }
   };

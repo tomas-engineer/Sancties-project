@@ -63,27 +63,6 @@ export default function Leerlingen() {
     }));
   };
 
-  const SanctieToevoegen = (
-    e: React.MouseEvent,
-    naam: string,
-    leerling: { id: number; name: string; sancties: string[] }
-  ) => {
-    e.stopPropagation();
-
-    setLeerlingen((prev) =>
-      prev.map((prevLeerling) =>
-        prevLeerling.id === leerling.id
-          ? {
-              ...prevLeerling,
-              sancties: prevLeerling.sancties.includes(naam)
-                ? prevLeerling.sancties.filter((s) => s !== naam)
-                : [...prevLeerling.sancties, naam],
-            }
-          : prevLeerling
-      )
-    );
-  };
-
   const FilteredLeerlingen = leerlingen.filter((leerling) => {
     const { hasId, hasName, hasSancties } = filter;
 
@@ -94,6 +73,85 @@ export default function Leerlingen() {
 
     return true;
   });
+
+  const EditLeerling = async ({
+    e,
+    sanctieNaam,
+    leerling,
+    type,
+  }: {
+    e: React.FocusEvent | React.MouseEvent;
+    sanctieNaam?: string;
+    leerling: Leerling;
+    type: "Naam" | "Sancties";
+  }) => {
+    if (!type) return;
+    const sendRequest = async (body: unknown) => {
+      const response = await fetch("/api/leerlingen/edit", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok)
+        return console.log(
+          "Failed to edit the leerling: " + (await response.text())
+        );
+
+      const data = await response.json();
+      if (!data.success) return;
+      return true;
+    };
+
+    if (type === "Sancties" && sanctieNaam) {
+      e.preventDefault();
+
+      const parentElement = (e.target as HTMLElement).closest("div");
+      const element = parentElement?.querySelector("span") as HTMLSpanElement;
+      const selectedSanctie = element.textContent;
+
+      const newSanctieNames = leerling.sancties.includes(selectedSanctie)
+        ? leerling.sancties.filter((sanctie) => sanctie !== selectedSanctie)
+        : [...leerling.sancties, selectedSanctie];
+
+      const newSanctieIds = sancties
+        .filter((sanctie) => newSanctieNames.includes(sanctie.naam))
+        .map((sanctie) => sanctie.id);
+
+      const result = await sendRequest({
+        id: leerling.id,
+        editType: "setSancties",
+        sanctieIds: newSanctieIds,
+      });
+
+      if (result)
+        setLeerlingen((prev) =>
+          prev.map((prevLeerling) =>
+            prevLeerling.id === leerling.id
+              ? {
+                  ...prevLeerling,
+                  sancties: prevLeerling.sancties.includes(sanctieNaam)
+                    ? prevLeerling.sancties.filter((s) => s !== sanctieNaam)
+                    : [...prevLeerling.sancties, sanctieNaam],
+                }
+              : prevLeerling
+          )
+        );
+    }
+
+    if (type === "Naam") {
+      const element = e.target as HTMLInputElement;
+
+      const oldName = leerling.name;
+      const newName = element.value;
+
+      if (oldName !== newName && newName.length > 0)
+        sendRequest({
+          id: leerling.id,
+          editType: "naam",
+          naam: newName
+        });
+    }
+  };
 
   const RemoveLeerling = async (
     e: React.MouseEvent,
@@ -237,7 +295,20 @@ export default function Leerlingen() {
               FilteredLeerlingen.map((leerling, i) => (
                 <tr key={i}>
                   <th scope="row">{leerling.id}</th>
-                  <td>{leerling.name}</td>
+                  <td>
+                    <input
+                      type="text"
+                      defaultValue={leerling.name}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          (e.target as HTMLInputElement).blur();
+                        }
+                      }}
+                      onBlur={(e) =>
+                        EditLeerling({ e, leerling, type: "Naam" })
+                      }
+                    />
+                  </td>
                   <td>
                     {leerling.sancties.length > 0 ? (
                       <div className="flex flex-row items-center gap-3">
@@ -271,7 +342,12 @@ export default function Leerlingen() {
                           <Dropdown.Item
                             key={index}
                             onClick={(e) =>
-                              SanctieToevoegen(e, sanctie.naam, leerling)
+                              EditLeerling({
+                                e,
+                                leerling,
+                                type: "Sancties",
+                                sanctieNaam: sanctie.naam,
+                              })
                             }
                           >
                             <div className="flex flex-row items-center gap-2">
