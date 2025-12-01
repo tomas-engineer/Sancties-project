@@ -34,7 +34,9 @@ export async function POST(req: NextRequest) {
 
     // Edit naam
     if (editType === 'naam') {
-      if (!body?.id || !body?.naam) {
+      const { id, naam } = body;
+      
+      if (!id || !naam) {
         return SendResponse(
           {
             success: false,
@@ -44,8 +46,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      console.log('Attempting to edit leerling naam:', body.id, body.naam);
-      const edited = EditLeerling(body.id, body.naam);
+      console.log('Attempting to edit leerling naam:', id, naam);
+      const edited = EditLeerling(id, naam);
       console.log('Edit result:', edited);
 
       if (!edited) {
