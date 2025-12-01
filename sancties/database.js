@@ -131,6 +131,27 @@ export function FetchLeerlingen() {
    return result;
 }
 
+export function AddLeerling(naam) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(`INSERT INTO Leerlingen (naam) VALUES (?)`);
+      const result = stmt.run(naam);
+
+      db.close();
+
+      return {
+         success: result.changes > 0,
+         id: result.lastInsertRowid,
+         message: "Leerling added successfully",
+      };
+   } catch (error) {
+      db.close();
+      console.error("Add leerling error:", error);
+      return { success: false, message: error.message };
+   }
+}
+
 export function DeleteLeerling(id) {
    const db = connect();
 
@@ -148,6 +169,128 @@ export function DeleteLeerling(id) {
    }
 }
 
+export function EditLeerling(id, naam) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(`UPDATE Leerlingen SET naam = ? WHERE ID = ?`);
+      const result = stmt.run(naam, id);
+
+      db.close();
+
+      return result.changes > 0;
+   } catch (error) {
+      db.close();
+      console.error("Edit error:", error);
+      return false;
+   }
+}
+
+export function AddSanctieToLeerling(leerlingId, sanctieId) {
+   const db = connect();
+
+   try {
+      // Check if this combination already exists
+      const checkStmt = db.prepare(`
+         SELECT ID FROM Straffen 
+         WHERE "Leerling ID" = ? AND "Sanctie ID" = ?
+      `);
+      const existing = checkStmt.get(leerlingId, sanctieId);
+
+      if (existing) {
+         db.close();
+         return {
+            success: false,
+            message: "Sanctie already assigned to this leerling",
+         };
+      }
+
+      const stmt = db.prepare(`
+         INSERT INTO Straffen ("Leerling ID", "Sanctie ID") 
+         VALUES (?, ?)
+      `);
+      const result = stmt.run(leerlingId, sanctieId);
+
+      db.close();
+
+      return {
+         success: result.changes > 0,
+         message: "Sanctie added successfully",
+      };
+   } catch (error) {
+      db.close();
+      console.error("Add sanctie error:", error);
+      return { success: false, message: error.message };
+   }
+}
+
+export function RemoveSanctieFromLeerling(leerlingId, sanctieId) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(`
+         DELETE FROM Straffen 
+         WHERE "Leerling ID" = ? AND "Sanctie ID" = ?
+      `);
+      const result = stmt.run(leerlingId, sanctieId);
+
+      db.close();
+
+      return result.changes > 0;
+   } catch (error) {
+      db.close();
+      console.error("Remove sanctie error:", error);
+      return false;
+   }
+}
+
+export function SetSanctiesForLeerling(leerlingId, sanctieIds) {
+   const db = connect();
+
+   try {
+      // Start a transaction for atomicity
+      db.prepare("BEGIN").run();
+
+      // First, remove all existing sancties for this leerling
+      const deleteStmt = db.prepare(`
+         DELETE FROM Straffen WHERE "Leerling ID" = ?
+      `);
+      deleteStmt.run(leerlingId);
+
+      // Then, add all new sancties
+      if (sanctieIds && sanctieIds.length > 0) {
+         const insertStmt = db.prepare(`
+            INSERT INTO Straffen ("Leerling ID", "Sanctie ID") 
+            VALUES (?, ?)
+         `);
+
+         for (const sanctieId of sanctieIds) {
+            insertStmt.run(leerlingId, sanctieId);
+         }
+      }
+
+      // Commit the transaction
+      db.prepare("COMMIT").run();
+      db.close();
+
+      return {
+         success: true,
+         message: "Sancties successfully set for leerling",
+      };
+   } catch (error) {
+      // Rollback on error
+      try {
+         db.prepare("ROLLBACK").run();
+      } catch (rollbackError) {
+         console.error("Rollback error:", rollbackError);
+      }
+
+      db.close();
+      console.error("Set sancties error:", error);
+      return { success: false, message: error.message };
+   }
+}
+
 export function FetchSancties() {
    const db = connect();
 
@@ -157,4 +300,85 @@ export function FetchSancties() {
    db.close();
 
    return rows;
+}
+
+export function AddSanctie(naam, niveau) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(
+         `INSERT INTO Sancties (naam, niveau) VALUES (?, ?)`
+      );
+      const result = stmt.run(naam, niveau);
+
+      db.close();
+
+      return {
+         success: result.changes > 0,
+         id: result.lastInsertRowid,
+         message: "Sanctie added successfully",
+      };
+   } catch (error) {
+      db.close();
+      console.error("Add sanctie error:", error);
+      return { success: false, message: error.message };
+   }
+}
+
+export function EditSanctie(id, naam, niveau) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(
+         `UPDATE Sancties SET naam = ?, niveau = ? WHERE ID = ?`
+      );
+      const result = stmt.run(naam, niveau, id);
+
+      db.close();
+
+      return {
+         success: result.changes > 0,
+         message:
+            result.changes > 0
+               ? "Sanctie updated successfully"
+               : "Sanctie not found",
+      };
+   } catch (error) {
+      db.close();
+      console.error("Edit sanctie error:", error);
+      return { success: false, message: error.message };
+   }
+}
+
+export function DeleteSanctie(id) {
+   const db = connect();
+
+   try {
+      const stmt = db.prepare(`DELETE FROM Sancties WHERE ID = ?`);
+      const result = stmt.run(id);
+
+      db.close();
+
+      return {
+         success: result.changes > 0,
+         message:
+            result.changes > 0
+               ? "Sanctie deleted successfully"
+               : "Sanctie not found",
+      };
+   } catch (error) {
+      db.close();
+      console.error("Delete sanctie error:", error);
+
+      // Custom error message for foreign key constraint
+      if (error.message.includes("FOREIGN KEY constraint failed")) {
+         return {
+            success: false,
+            message:
+               "Cannot delete sanctie because it is assigned to one or more leerlingen",
+         };
+      }
+
+      return { success: false, message: error.message };
+   }
 }
