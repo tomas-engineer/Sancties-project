@@ -68,7 +68,9 @@ export async function POST(req: NextRequest) {
 
     // Set all sancties at once
     if (editType === 'setSancties') {
-      if (!body?.leerlingId) {
+      const { leerlingId, sanctieIds } = body;
+      
+      if (!leerlingId) {
         return SendResponse(
           {
             success: false,
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      if (!Array.isArray(body?.sanctieIds)) {
+      if (!Array.isArray(sanctieIds)) {
         return SendResponse(
           {
             success: false,
@@ -88,8 +90,8 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      console.log('Attempting to set sancties for leerling:', body.leerlingId, 'with IDs:', body.sanctieIds);
-      const result = SetSanctiesForLeerling(body.leerlingId, body.sanctieIds);
+      console.log('Attempting to set sancties for leerling:', leerlingId, 'with IDs:', sanctieIds);
+      const result = SetSanctiesForLeerling(leerlingId, sanctieIds);
 
       if (!result.success) {
         // Check for FOREIGN KEY constraint error
@@ -115,7 +117,9 @@ export async function POST(req: NextRequest) {
 
     // Add or remove sanctie
     if (editType === 'addSanctie' || editType === 'removeSanctie') {
-      if (!body?.leerlingId || !body?.sanctieId) {
+      const { leerlingId, sanctieId } = body;
+      
+      if (!leerlingId || !sanctieId) {
         return SendResponse(
           {
             success: false,
@@ -125,10 +129,10 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      console.log('Attempting to', editType, 'sanctie:', body.sanctieId, 'to/from leerling:', body.leerlingId);
+      console.log('Attempting to', editType, 'sanctie:', sanctieId, 'to/from leerling:', leerlingId);
 
       if (editType === 'removeSanctie') {
-        const result = RemoveSanctieFromLeerling(body.leerlingId, body.sanctieId);
+        const result = RemoveSanctieFromLeerling(leerlingId, sanctieId);
         if (!result) {
           return SendResponse(
             {
@@ -143,7 +147,7 @@ export async function POST(req: NextRequest) {
           message: "Sanctie successfully removed from leerling"
         });
       } else {
-        const result = AddSanctieToLeerling(body.leerlingId, body.sanctieId);
+        const result = AddSanctieToLeerling(leerlingId, sanctieId);
         if (!result.success) {
           // Check for FOREIGN KEY constraint error
           let errorMessage = result.message;
