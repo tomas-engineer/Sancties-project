@@ -24,55 +24,25 @@ export default function New() {
       return;
     }
 
-    try {
-      console.log('Sending request to:', '/api/leerlingen/maken');
-      console.log('With data:', { naam: name });
+    const response = await fetch("/api/leerlingen/add", {
+      method: "POST",
+      body: JSON.stringify({
+        naam: name,
+      }),
+    });
 
-      const response = await fetch("/api/leerlingen/maken", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          naam: name,
-        }),
-      });
+    if (!response.ok)
+      return console.log(
+        "Something went wrong making the user: " + (await response.text())
+      );
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+    const data = await response.json();
+    if (!data.success) response;
 
-      // Check content type
-      const contentType = response.headers.get('content-type');
-      console.log('Content-Type:', contentType);
+    if (input) input.value = "";
+    setLoading(false);
 
-      if (!contentType || !contentType.includes('application/json')) {
-        // We krijgen HTML in plaats van JSON
-        const htmlText = await response.text();
-        console.error('Received HTML instead of JSON:', htmlText.substring(0, 200));
-        setError('API route not found or returning HTML');
-        setLoading(false);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("Leerling aangemaakt:", data);
-        // Reset form
-        if (input) input.value = '';
-        // Optioneel: ga terug naar leerlingen page
-        // router.push('/leerlingen');
-        setError("Leerling succesvol aangemaakt!");
-      } else {
-        console.error("Fout bij het aanmaken van leerling:", data.error);
-        setError(data.error || "Er is een fout opgetreden");
-      }
-    } catch (err) {
-      console.error("Netwerkfout:", err);
-      setError("Er is een netwerkfout opgetreden");
-    } finally {
-      setLoading(false);
-    }
+    router.push("/leerlingen");
   };
 
   return (
@@ -94,8 +64,12 @@ export default function New() {
         </button>
       </form>
 
-      {typeof error === 'string' && (
-        <span className={error.includes('succesvol') ? 'text-green-500' : 'text-red-400'}>
+      {typeof error === "string" && (
+        <span
+          className={
+            error.includes("succesvol") ? "text-green-500" : "text-red-400"
+          }
+        >
           {error}
         </span>
       )}
