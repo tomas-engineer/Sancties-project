@@ -27,14 +27,22 @@ export default function Rad() {
 
   useEffect(() => {
     const FetchSancties = async () => {
+      const response = await fetch("/api/sancties");
+
       try {
-        const response = await fetch("/api/sancties");
+        const data = await response.json();
+
         if (!response.ok) {
-          console.error(await response.text());
-          return;
+          if (data?.message) alert(data.message);
+
+          throw new Error(
+            "Something went wrong fetching sancties: " +
+              (data?.message || (await response.text()))
+          );
         }
 
-        const data = await response.json();
+        if (!data.success) return alert(data.message);
+
         if (data?.sancties) {
           const sancties = data.sancties.map(
             ({
@@ -54,7 +62,7 @@ export default function Rad() {
           setSancties(sancties);
         }
       } catch (error) {
-        console.error("Fout bij het ophalen van sancties:", error);
+        console.error(error instanceof Error ? error.message : error);
       } finally {
         setLoading(false);
       }
@@ -128,7 +136,7 @@ export default function Rad() {
         )
     );
 
-    console.log(data && Number.isFinite(Number(data)) ? Number(data) : 0)
+    console.log(data && Number.isFinite(Number(data)) ? Number(data) : 0);
     setNiveau(data && Number.isFinite(Number(data)) ? Number(data) : 0);
 
     if (data && Number.isFinite(Number(data))) {

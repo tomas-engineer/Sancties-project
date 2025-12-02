@@ -92,14 +92,24 @@ export default function Leerlingen() {
         body: JSON.stringify(body),
       });
 
-      if (!response.ok)
-        return console.log(
-          "Failed to edit the leerling: " + (await response.text())
-        );
+      try {
+        const data = await response.json();
 
-      const data = await response.json();
-      if (!data.success) return;
-      return true;
+        if (!response.ok) {
+          if (data?.message) alert(data.message);
+
+          throw new Error(
+            "Something went wrong editing the user: " +
+              (data?.message || (await response.text()))
+          );
+        }
+
+        if (!data.success) return alert(data.message);
+
+        return true;
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
+      }
     };
 
     if (type === "Sancties" && sanctieNaam) {
@@ -148,7 +158,7 @@ export default function Leerlingen() {
         sendRequest({
           id: leerling.id,
           editType: "naam",
-          naam: newName
+          naam: newName,
         });
     }
   };
@@ -168,47 +178,90 @@ export default function Leerlingen() {
       }),
     });
 
-    if (!response.ok)
-      return console.log(
-        "Something went wrong deleting the user: " + (await response.text())
+    try {
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data?.message) alert(data.message);
+
+        throw new Error(
+          "Something went wrong deleting the user: " +
+            (data?.message || (await response.text()))
+        );
+      }
+
+      if (!data.success) return alert(data.message);
+
+      setLeerlingen((prev) =>
+        prev.filter((prevLeerling) => prevLeerling.id !== leerling.id)
       );
-
-    const data = await response.json();
-    if (!data.success) return;
-
-    setLeerlingen((prev) =>
-      prev.filter((prevLeerling) => prevLeerling.id !== leerling.id)
-    );
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+    }
   };
 
   useEffect(() => {
     const FetchLeerlingen = async () => {
       const response = await fetch("/api/leerlingen");
-      if (!response.ok) return console.log(await response.text());
 
-      const data = await response.json();
-      if (data?.leerlingen) {
-        const mappedLeerlingen: Leerling[] = data.leerlingen.map((l: any) => ({
-          id: l.ID,
-          name: l.naam,
-          sancties: l.sancties.map((s: any) => s.naam),
-        }));
-        setLeerlingen(mappedLeerlingen);
+      try {
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data?.message) alert(data.message);
+
+          throw new Error(
+            "Something went wrong fetching the users: " +
+              (data?.message || (await response.text()))
+          );
+        }
+
+        if (!data.success) return alert(data.message);
+
+        if (data?.leerlingen) {
+          const mappedLeerlingen: Leerling[] = data.leerlingen.map(
+            (l: any) => ({
+              id: l.ID,
+              name: l.naam,
+              sancties: l.sancties.map((s: any) => s.naam),
+            })
+          );
+
+          setLeerlingen(mappedLeerlingen);
+        }
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
       }
     };
 
     const FetchSancties = async () => {
       const response = await fetch("/api/sancties");
-      if (!response.ok) return console.log(await response.text());
 
-      const data = await response.json();
-      if (data?.sancties) {
-        const mappedSancties: Sanctie[] = data.sancties.map((s: any) => ({
-          id: s.ID,
-          naam: s.naam,
-          niveau: s.niveau,
-        }));
-        setSancties(mappedSancties);
+      try {
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data?.message) alert(data.message);
+
+          throw new Error(
+            "Something went wrong fetching sancties: " +
+              (data?.message || (await response.text()))
+          );
+        }
+
+        if (!data.success) return alert(data.message);
+
+        if (data?.sancties) {
+          const mappedSancties: Sanctie[] = data.sancties.map((s: any) => ({
+            id: s.ID,
+            naam: s.naam,
+            niveau: s.niveau,
+          }));
+
+          setSancties(mappedSancties);
+        }
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : error);
       }
     };
 

@@ -31,18 +31,27 @@ export default function New() {
       }),
     });
 
-    if (!response.ok)
-      return console.log(
-        "Something went wrong making the user: " + (await response.text())
-      );
+    try {
+      const data = await response.json();
 
-    const data = await response.json();
-    if (!data.success) response;
+      if (!response.ok) {
+        if (data?.message) alert(data.message);
 
-    if (input) input.value = "";
-    setLoading(false);
+        throw new Error(
+          "Something went wrong making the user: " +
+            (data?.message || (await response.text()))
+        );
+      }
 
-    router.push("/leerlingen");
+      if (!data.success) return alert(data.message);
+
+      if (input) input.value = "";
+      setLoading(false);
+
+      router.push("/leerlingen");
+    } catch (error: unknown) {
+      console.error(error instanceof Error ? error.message : error);
+    }
   };
 
   return (

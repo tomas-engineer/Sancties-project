@@ -1,12 +1,14 @@
 "use client";
 /* Alles van Tomas */
 
+import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 export default function New() {
   const [error, setError] = useState<string | boolean>(false);
+  const router = useRouter();
 
-  const SubmitForm = (e: FormEvent) => {
+  const SubmitForm = async (e: FormEvent) => {
     e.preventDefault();
     setError(false);
 
@@ -23,8 +25,33 @@ export default function New() {
     if (!name || !niveau)
       return setError("Een of meerdere velden zijn niet ingevuld");
 
-    console.log(name);
-    console.log(niveau);
+    const response = await fetch("/api/sancties/add", {
+      method: "POST",
+      body: JSON.stringify({
+        naam: name,
+        niveau: Number(niveau),
+      }),
+    });
+
+    try {
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data?.message) alert(data.message);
+
+        throw new Error(
+          "Something went wrong making the sanctie: " +
+            (data?.message || (await response.text()))
+        );
+      }
+
+      if (!data.success) return alert(data.message);
+
+      if (niveauInput) niveauInput.value = "";
+      router.push("/sancties");
+    } catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+    }
   };
 
   return (
