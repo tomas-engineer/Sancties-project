@@ -5,6 +5,7 @@ import FloatingButton from "@/components/FloatingButton";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
+import StrengtheidIndicator from "@/components/StrengtheidIndicator";
 
 interface Filter {
   hasId?: number;
@@ -382,7 +383,7 @@ export default function Leerlingen() {
           </tbody>
         </table>
       </div>
-
+      <StrengtheidIndicator />
       <FloatingButton target="/leerlingen/new" />
     </section>
   );
