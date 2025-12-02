@@ -30,6 +30,7 @@ export default function Leerlingen() {
   const [sancties, setSancties] = useState<Sanctie[]>([]);
   const [leerlingen, setLeerlingen] = useState<Leerling[]>([]);
   const [filter, setFilter] = useState<Filter>({});
+  const [strengheidRefresh, setStrengheidRefresh] = useState(0);
 
   const UpdateFilters = ({
     type,
@@ -134,7 +135,7 @@ export default function Leerlingen() {
         sanctieIds: newSanctieIds,
       });
 
-      if (result)
+      if (result) {
         setLeerlingen((prev) =>
           prev.map((prevLeerling) =>
             prevLeerling.id === leerling.id
@@ -147,6 +148,8 @@ export default function Leerlingen() {
               : prevLeerling
           )
         );
+        setStrengheidRefresh((prev) => prev + 1);
+      }
     }
 
     if (type === "Naam") {
@@ -436,7 +439,7 @@ export default function Leerlingen() {
           </tbody>
         </table>
       </div>
-      <StrengtheidIndicator />
+      <StrengtheidIndicator refreshTrigger={strengheidRefresh} />
       <FloatingButton target="/leerlingen/new" />
     </section>
   );

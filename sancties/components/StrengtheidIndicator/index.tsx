@@ -9,7 +9,11 @@ interface StrengtheidData {
   percentage: number;
 }
 
-export default function StrengtheidIndicator() {
+interface StrengtheidIndicatorProps {
+  refreshTrigger?: number;
+}
+
+export default function StrengtheidIndicator({ refreshTrigger }: StrengtheidIndicatorProps) {
   const [data, setData] = useState<StrengtheidData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,7 +36,7 @@ export default function StrengtheidIndicator() {
     };
 
     fetchStrengheid();
-  }, []);
+  }, [refreshTrigger]);
 
   if (loading) {
     return (
