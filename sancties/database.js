@@ -48,7 +48,7 @@ export function create() {
    ).run();
 
    console.log("Tables created with foreign key constraints.");
-};
+}
 
 export function seed() {
    const db = connect();
@@ -340,19 +340,33 @@ export function EditSanctie(id, naam, niveau) {
    const db = connect();
 
    try {
+      // First get current values
+      const current = db
+         .prepare(`SELECT naam, niveau FROM Sancties WHERE ID = ?`)
+         .get(id);
+
+      if (!current) {
+         db.close();
+         return {
+            success: false,
+            message: "Sanctie not found",
+         };
+      }
+
+      // Use current values if not provided
+      const newNaam = naam !== undefined ? naam : current.naam;
+      const newNiveau = niveau !== undefined ? niveau : current.niveau;
+
       const stmt = db.prepare(
          `UPDATE Sancties SET naam = ?, niveau = ? WHERE ID = ?`
       );
-      const result = stmt.run(naam, niveau, id);
+      const result = stmt.run(newNaam, newNiveau, id);
 
       db.close();
 
       return {
          success: result.changes > 0,
-         message:
-            result.changes > 0
-               ? "Sanctie updated successfully"
-               : "Sanctie not found",
+         message: "Sanctie updated successfully",
       };
    } catch (error) {
       db.close();
@@ -390,6 +404,34 @@ export function DeleteSanctie(id) {
          };
       }
 
+      return { success: false, message: error.message };
+   }
+}
+
+export function GetDocentStrengheid() {
+   const db = connect();
+
+   try {
+      // Calculate average niveau of all assigned sancties
+      const stmt = db.prepare(`
+         SELECT AVG(s.niveau) as gemiddelde
+         FROM Straffen st
+         INNER JOIN Sancties s ON s.ID = st."Sanctie ID"
+      `);
+
+      const result = stmt.get();
+      db.close();
+
+      const gemiddelde = result.gemiddelde || 0;
+
+      return {
+         success: true,
+         strengheid: Math.round(gemiddelde * 100) / 100, // Round to 2 decimals
+         percentage: gemiddelde > 0 ? Math.round((gemiddelde / 3) * 100) : 0, // Percentage van max niveau (3)
+      };
+   } catch (error) {
+      db.close();
+      console.error("Get strengheid error:", error);
       return { success: false, message: error.message };
    }
 }

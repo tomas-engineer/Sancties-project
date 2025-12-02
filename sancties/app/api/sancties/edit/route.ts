@@ -27,21 +27,31 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!naam || typeof naam !== "string" || naam.trim() === "") {
+    if (!naam && niveau === undefined) {
       return SendResponse(
         {
           success: false,
-          message: "Naam is required and must be a non-empty string",
+          message: "At least naam or niveau must be provided",
         },
         400
       );
     }
 
-    if (niveau === undefined || typeof niveau !== "number") {
+    if (naam !== undefined && (typeof naam !== "string" || naam.trim() === "")) {
       return SendResponse(
         {
           success: false,
-          message: "Niveau is required and must be a number",
+          message: "Naam must be a non-empty string",
+        },
+        400
+      );
+    }
+
+    if (niveau !== undefined && typeof niveau !== "number") {
+      return SendResponse(
+        {
+          success: false,
+          message: "Niveau must be a number",
         },
         400
       );
